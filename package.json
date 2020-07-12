@@ -6,8 +6,7 @@
   "scripts": {
     "lint": "eslint",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "lite-server",
-    "start_2": "ts-node-dev --respawn --transpile-only app.ts"
+    "start": "lite-server"
   },
   "keywords": [
     "typescript"
@@ -25,8 +24,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.1.4",
     "lite-server": "^2.5.4",
-    "prettier": "^2.0.5",
-    "ts-node-dev": "^1.0.0-pre.51",
-    "typescript": "^3.9.6"
-  }
+    "prettier": "^2.0.5"
+  },
+  "dependencies": {}
 }
