@@ -1,196 +1,120 @@
-//* Intersection Types
-type Admin = {
-  name: string;
-  privileges: string[];
-};
+//* Generics
+// const names: Array<string> = ['Max', 'Manu']; //* string[]
+// // names[0].split(' ');
 
-type Employee = {
-  name: string;
-  startDate: Date;
-};
+// const promise: Promise<string> = new Promise((resolve, reject) => {
+//   setTimeout(() => {
+//     resolve('This is done!');
+//   }, 2000);
+// });
 
-// interface ElevatedEmployee extends Admin, Employee {}
-type ElevatedEmployee = Admin & Employee; // intersection = combination of object types (Admin and Employee)
-// Result:
-// type ElevatedEmployee = {
-//   name: string;
-//   privileges: string[];
-//   startDate: Date;
-// }
+// //* Alternative
+// const promise2 = new Promise<string>((resolve, reject) => {
+//   setTimeout(() => {
+//     resolve('This is done!');
+//   }, 2000);
+// });
 
-const e1: ElevatedEmployee = {
-  name: 'Max',
-  privileges: ['create-server'],
-  startDate: new Date(),
-};
+// promise.then((data) => {
+//   data.split(' ');
+// });
 
-type Combinable = string | number;
-type Numeric = number | boolean;
+//* Inserting constraints in generic types
+function merge<T extends object, U extends object>(objA: T, objB: U) {
+  //* Inferred return type: T & U
+  return Object.assign(objA, objB);
+}
 
-type Universal = Combinable & Numeric; // intersection of union types = only common attributes
-// Universal: number;
+const mergedObj = merge({ name: 'Max', hobbies: ['Sports'] }, { age: 30 });
+const mergedObj2 = merge({ name: 'Max' }, { age: 30 });
+console.log(mergedObj.age);
 
-//* Function Overloads
-//! We must declare all possible combinations that we want to call this function
-function add(a: number, b: number): number;
-function add(a: number, b: string): string;
-function add(a: string, b: number): string;
-// function add(a: string, b: string): string;
-function add(a: Combinable, b: Combinable) {
-  //* Type Guard using "typeof" operator (works with primitive types)
-  if (typeof a === 'string' || typeof b === 'string') {
-    return a.toString() + b.toString();
+interface Lengthy {
+  length: number;
+}
+
+//! "extends" can be used with classes or interfaces on generic constraints
+function countAndDescribe<T extends Lengthy>(element: T): [T, string] {
+  let descriptionText = 'Got no value.';
+  if (element.length === 1) {
+    descriptionText = 'Got 1 element.';
+  } else if (element.length > 1) {
+    descriptionText = 'Got ' + element.length + ' elements.';
   }
-  return a + b;
+  return [element, descriptionText];
 }
 
-const result1 = add(2, 5);
-const result2 = add(2, '5');
-const result3 = add('2', 5);
-// const result4 = add('2', '5'); //! Error because there's no matching function overload
+console.log(countAndDescribe('Hi there!'));
+console.log(countAndDescribe(['Sports', 'Cooking']));
+console.log(countAndDescribe([]));
 
-// type UnknownEmployee = Employee | Admin;
-
-// function printEmployeeInformation(emp: UnknownEmployee) {
-//   console.log('Name: ' + emp.name);
-//   //* Type Guard using "in" operator (works with objects)
-//   if ('privileges' in emp) {
-//     console.log('Privileges: ' + emp.privileges);
-//   }
-//   if ('startDate' in emp) {
-//     console.log('Start Date: ' + emp.startDate);
-//   }
+//* keyof constraint
+// function extractAndConvert(obj: object, key: string) {
+//   //! No guarantee that the specific key passed as an argument will exist on this object
+//   return 'Value: ' + obj[key];
 // }
 
-// printEmployeeInformation(e1);
-
-// class Car {
-//   drive() {
-//     console.log('Driving...');
-//   }
-// }
-
-// class Truck {
-//   drive() {
-//     console.log('Driving a truck...');
-//   }
-
-//   loadCargo(amount: number) {
-//     console.log('Loading cargo...' + amount);
-//   }
-// }
-
-// type Vehicle = Car | Truck;
-
-// const v1 = new Car();
-// const v2 = new Truck();
-
-// function useVehicle(vehicle: Vehicle) {
-//   vehicle.drive();
-//   //* Type Guard using "instanceof" operator (works with objects)
-//   //! Can only be used with classes, not interfaces (because "instanceof" uses
-//   //! constructor functions from JS, and interfaces are a construct of TS)
-//   // if ('loadCargo' in vehicle) {
-//   if (vehicle instanceof Truck) {
-//     vehicle.loadCargo(1000);
-//   }
-// }
-
-// useVehicle(v1);
-// useVehicle(v2);
-
-// //* Discriminated Union
-// //* Each interface has a "type" or "kind" property that describes each object
-// interface Bird {
-//   type: 'bird'; // Force each object based on this interface to have this type
-//   flyingSpeed: number;
-// }
-
-// interface Horse {
-//   type: 'horse';
-//   runningSpeed: number;
-// }
-
-// type Animal = Bird | Horse;
-
-// function moveAnimal(animal: Animal) {
-//   let speed;
-//   switch (animal.type) {
-//     case 'bird':
-//       speed = animal.flyingSpeed;
-//       break;
-//     case 'horse':
-//       speed = animal.runningSpeed;
-//       break;
-//   }
-//   console.log('Moving with speed: ' + speed);
-// }
-
-// moveAnimal({ type: 'bird', flyingSpeed: 10 });
-
-// //* Type Casting
-// // const userInputElement = <HTMLInputElement>document.getElementById('user-input')!;
-// const userInputElement = document.getElementById('user-input')! as HTMLInputElement;
-// userInputElement.value = 'Hi there!';
-
-// //! The "as" and "<...>" operator implicitly tell TS that the object is not null
-// //! Therefore, in this case, the "!" operator is redundant
-
-// const userInputElement2 = document.getElementById('user-input');
-// if (userInputElement2) {
-//   // (<HTMLInputElement>userInputElement2).value = 'Hi there!';
-//   (userInputElement2 as HTMLInputElement).value = 'Hi there!';
-// }
-
-// //* Index Types
-// interface ErrorContainer {
-//   // { email: 'Not a valid email', username: 'Must start with a capital character' }
-//   [prop: string]: string;
-//   //* Other properties can be added to this interface, always respecting the interface contract
-//   // id: string; //* Valid
-//   // code: number; //! Error
-// }
-
-// // const errorBag: ErrorContainer = {};
-// const errorBag: ErrorContainer = {
-//   email: 'Not a valid email',
-//   1: 'Not a valid email', //* Casted as a string
-//   username: 'Must start with a capital character',
-// };
-
-//* Optional Chaining
-interface User {
-  id: string;
-  name: string;
-  job?: {
-    title: string;
-    description: string;
-  };
+function extractAndConvert<T extends object, K extends keyof T>(obj: T, key: K) {
+  return 'Value: ' + obj[key];
 }
 
-const fetchedUserData: User = {
-  id: 'u1',
-  name: 'Max',
-  // job: {
-  //   title: 'CEO',
-  //   description: 'My own company',
-  // },
-  job: undefined,
-};
+// extractAndConvert({}, 'name'); //! Error
+extractAndConvert({ name: 'Max' }, 'name');
 
-// console.log(fetchedUserData.job && fetchedUserData.job.title); //* JS way of checking if property exists
-console.log(fetchedUserData.job?.title); //* Optional Chaining
+//* Generic Classes
+class DataStorage<T extends string | number | boolean> {
+  private data: T[] = [];
 
-//* Nullish Coalescing
-// const userInput = null;
-// const userInput = undefined;
-const userInput = ''; //* Treated as falsy with traditional || operator
-const userInput2 = 0; //* Treated as falsy with traditional || operator
+  addItem(item: T) {
+    this.data.push(item);
+  }
 
-// const storedData = userInput || 'Default'; //* Traditional way
+  removeItem(item: T) {
+    //! indexOf returns -1 if value is not found
+    const index = this.data.indexOf(item);
+    if (index !== -1) {
+      this.data.splice(index, 1);
+    }
+  }
 
-//? Nullish Coalescing operator (only checks null and undefined)
-//? All other falsy values (0, '', etc. are treated as truthy)
-const storedData = userInput ?? 'Default';
+  getItems() {
+    return [...this.data];
+  }
+}
 
-console.log(storedData);
+const textStorage = new DataStorage<string>();
+textStorage.addItem('Max');
+textStorage.addItem('Manu');
+textStorage.removeItem('Max');
+console.log(textStorage.getItems());
+
+const numberStorage = new DataStorage<number>();
+
+//* It's better not to use a DataStorage based on objects because the remoteItem method doesn't work as expected
+//* To work as how one should expect, the method should receive an "id" parameter, which is of course not supported by the current implementation
+// const objStorage = new DataStorage<object>();
+// const maxObj = { name: 'Max' };
+// objStorage.addItem(maxObj);
+// objStorage.addItem({ name: 'Manu' });
+// // ...
+// objStorage.removeItem(maxObj);
+// console.log(objStorage.getItems());
+
+//* Generic Utility Types
+interface CourseGoal {
+  title: string;
+  description: string;
+  completeUntil: Date;
+}
+
+function createCourseGoal(title: string, description: string, date: Date): CourseGoal {
+  let courseGoal: Partial<CourseGoal> = {};
+  courseGoal.title = title;
+  courseGoal.description = description;
+  courseGoal.completeUntil = date;
+  return courseGoal as CourseGoal;
+}
+
+const names: Readonly<string[]> = ['Max', 'Anna'];
+// names.push('Manu'); //! Error
+// names.pop(); //! Error
