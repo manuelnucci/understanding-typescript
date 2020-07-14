@@ -1,57 +1,57 @@
-// const userName = 'Max';
-// userName = 'Maximilian';
-
-// let age = 30;
-// age = 29;
-
-// var -> global and function scope
-// function add(a: number, b: number) {
-//   let result; // block scoped
-//   result = a + b;
-//   return result;
+type AddFn = (...numbers: number[]) => number; // more commonly used to define function types
+// interface AddFn {
+//   (...numbers: number[]): number; // function type definition inside interface
+//   (a: number, b: number): number;
 // }
 
-// if (age > 20) {
-//   let isOld = true;
-// }
-// console.log(isOld);
+let add: AddFn;
 
-// console.log(result);
-
-// const add = (a: number, b: number = 1) => a + b; // default parameters come last
-
-// const printOutput: (output: string | number) => void = (output) =>
-//   console.log(output);
-
-// const button = document.querySelector('button');
-
-// if (button) {
-//   button.addEventListener('click', (event) => console.log(event));
-// }
-
-// printOutput(add(5));
-
-const hobbies = ['Sports', 'Cooking'];
-const activeHobbies = ['Hiking'];
-
-activeHobbies.push(...hobbies);
-
-const person = {
-  firstName: 'Max',
-  age: 30,
+add = (...values: number[]) => {
+  return values.reduce((total, value) => total + value, 0);
 };
 
-const copiedPerson = { ...person };
-
-const add = (...numbers: number[]) => {
-  return numbers.reduce((curResult, curValue) => curResult + curValue, 0);
+add = (n1: number, n2: number) => {
+  return n1 + n2;
 };
 
-const addedNumbers = add(5, 10, 2, 3.7);
-console.log(addedNumbers);
+interface Named {
+  readonly name?: string;
+  outputName?: string; // optional property in nterface
+}
 
-const [hobby1, hobby2, ...remainingHobbies] = hobbies;
-console.log(hobbies, hobby1, hobby2, remainingHobbies);
+// classes can also implement types
+type Aged = {
+  readonly age: number;
+};
 
-const { firstName: userName, age } = person;
-console.log(userName, age, person);
+type Combination = Named | Aged; // combination of interface and type
+
+// interfaces are commonly used with classes
+interface Greetable extends Named, Aged {
+  greet?(phrase: string): void; // optional method
+}
+
+class Person implements Greetable {
+  age: number;
+
+  // optional property in class
+  constructor(public name?: string) {
+    this.age = 30;
+  }
+
+  greet(phrase: string) {
+    if (this.name) {
+      console.log(phrase + ' ' + this.name);
+    } else {
+      console.log('Hi!');
+    }
+  }
+}
+
+let user1: Greetable;
+
+user1 = new Person();
+// user1.name = 'Manu'; // property "name" inside class inherits all modifiers from interface
+
+user1.greet!('Hi there - I am');
+console.log(user1);

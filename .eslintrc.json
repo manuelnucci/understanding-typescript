@@ -12,13 +12,13 @@
   },
   "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
-    "prettier/prettier": "error",
-    "no-console": "off",
-    "no-restricted-syntax": "off",
-    "no-unused-vars": "off",
-    "prefer-const": "off",
-    "no-throw-literal": "off",
-    "no-useless-return": "off",
-    "consistent-return": "off"
+    "prettier/prettier": "error"
+    // "no-console": "off"
+    // "no-restricted-syntax": "off",
+    // "no-unused-vars": "off",
+    // "prefer-const": "off",
+    // "no-throw-literal": "off",
+    // "no-useless-return": "off",
+    // "consistent-return": "off"
   }
 }
